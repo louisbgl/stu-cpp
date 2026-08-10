@@ -126,6 +126,22 @@ public:
         return _nanoseconds != other._nanoseconds;
     }
 
+    bool operator<(const Duration& other) const {
+        return _nanoseconds < other._nanoseconds;
+    }
+
+    bool operator<=(const Duration& other) const {
+        return _nanoseconds <= other._nanoseconds;
+    }
+
+    bool operator>(const Duration& other) const {
+        return _nanoseconds > other._nanoseconds;
+    }
+
+    bool operator>=(const Duration& other) const {
+        return _nanoseconds >= other._nanoseconds;
+    }
+
 private:
     int64_t _nanoseconds = 0; // gives a max of ~292 years (negative or positive)
 
