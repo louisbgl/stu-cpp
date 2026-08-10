@@ -50,7 +50,7 @@ public:
     }
 
     std::string to_string() const {
-        std::string result;
+        std::string result = "";
         int64_t abs_ns = _nanoseconds >= 0 ? _nanoseconds : -_nanoseconds;
         for (const auto& unit : _UNITS) {
             if (abs_ns >= unit.threshold_ns) {
@@ -68,6 +68,22 @@ public:
             }
         }
 
+        if (_nanoseconds < 0) result = "-" + result;
+        return result;
+    }
+
+    std::string to_string_exact() const {
+        std::string result = "";
+        int64_t remaining = _nanoseconds >= 0 ? _nanoseconds : -_nanoseconds;
+        for (const auto& unit : _UNITS) {
+            int64_t whole = remaining / unit.divisor_ns;
+            if (whole == 0) continue;
+
+            result += std::to_string(whole) + unit.suffix + " ";
+            remaining -= whole * unit.divisor_ns;
+        }
+        
+        if (result.empty()) result = "0 ns";
         if (_nanoseconds < 0) result = "-" + result;
         return result;
     }
@@ -124,12 +140,12 @@ private:
     };
 
     constexpr static Unit _UNITS[] = {
-        { _ONE_H_IN_NS,   _ONE_H_IN_NS,   " h" },
-        { _ONE_MIN_IN_NS, _ONE_MIN_IN_NS, " min" },
-        { _ONE_S_IN_NS,   _ONE_S_IN_NS,   " s" },
-        { _ONE_MS_IN_NS,  _ONE_MS_IN_NS,  " ms" },
-        { _ONE_US_IN_NS,  _ONE_US_IN_NS,  " us" },
-        { 0,             1,               " ns" } // fallback
+        { _ONE_H_IN_NS,   _ONE_H_IN_NS,   "h" },
+        { _ONE_MIN_IN_NS, _ONE_MIN_IN_NS, "min" },
+        { _ONE_S_IN_NS,   _ONE_S_IN_NS,   "s" },
+        { _ONE_MS_IN_NS,  _ONE_MS_IN_NS,  "ms" },
+        { _ONE_US_IN_NS,  _ONE_US_IN_NS,  "us" },
+        { 0,             1,               "ns" } // fallback
     };
 };
 
