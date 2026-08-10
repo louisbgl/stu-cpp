@@ -1,0 +1,29 @@
+# Build artifacts
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+*.out
+a.out
+
+# Compile commands
+compile_commands.json
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing binaries
+testing
+test
+tests/test_*
+
+# Documentation (except specific files)
+*.md
+!README.md
+!LICENSE.md
