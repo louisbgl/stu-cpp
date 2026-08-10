@@ -89,18 +89,21 @@ public:
     }
 
     Duration operator+(const Duration& other) const {
+        // TODO: overflow check - large positive + large positive can overflow int64_t
         Duration result;
         result._nanoseconds = _nanoseconds + other._nanoseconds;
         return result;
     }
 
     Duration operator-(const Duration& other) const {
+        // TODO: overflow check - large negative - large positive can overflow int64_t
         Duration result;
         result._nanoseconds = _nanoseconds - other._nanoseconds;
         return result;
     }
 
     Duration operator*(int64_t scalar) const {
+        // TODO: overflow check - large duration * large scalar can overflow int64_t
         Duration result;
         result._nanoseconds = _nanoseconds * scalar;
         return result;
