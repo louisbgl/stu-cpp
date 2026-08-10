@@ -100,18 +100,6 @@ public:
         return result;
     }
 
-    Duration operator*(const Duration& other) const {
-        Duration result;
-        result._nanoseconds = _nanoseconds * other._nanoseconds;
-        return result;
-    }
-
-    Duration operator/(const Duration& other) const {
-        Duration result;
-        result._nanoseconds = _nanoseconds / other._nanoseconds;
-        return result;
-    }
-
     Duration operator*(int64_t scalar) const {
         Duration result;
         result._nanoseconds = _nanoseconds * scalar;
