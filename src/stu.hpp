@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <format>
 #include <iostream>
 
 namespace stu {
@@ -36,13 +37,39 @@ public:
         return Duration::from_ns(hours * _ONE_H_IN_NS);
     }
 
+    int64_t in_ns() const {
+        return _nanoseconds;
+    }
+
+    int64_t in_us() const {
+        return _nanoseconds / _ONE_US_IN_NS;
+    }
+
+    int64_t in_ms() const {
+        return _nanoseconds / _ONE_MS_IN_NS;
+    }
+
     std::string to_string() const {
-        if      (_nanoseconds < _ONE_US_IN_NS)  return std::to_string(_nanoseconds) + " ns";
-        else if (_nanoseconds < _ONE_MS_IN_NS)  return std::to_string(_nanoseconds / _ONE_US_IN_NS) + " us";
-        else if (_nanoseconds < _ONE_S_IN_NS)   return std::to_string(_nanoseconds / _ONE_MS_IN_NS) + " ms";
-        else if (_nanoseconds < _ONE_MIN_IN_NS) return std::to_string(_nanoseconds / _ONE_S_IN_NS) + " s";
-        else if (_nanoseconds < _ONE_H_IN_NS)   return std::to_string(_nanoseconds / _ONE_MIN_IN_NS) + " min";
-        else return "does this even happen? " + std::to_string(_nanoseconds) + " ns";
+        std::string result;
+        int64_t abs_ns = _nanoseconds >= 0 ? _nanoseconds : -_nanoseconds;
+        for (const auto& unit : _UNITS) {
+            if (abs_ns >= unit.threshold_ns) {
+                int64_t whole = abs_ns / unit.divisor_ns;
+                result = std::to_string(whole);
+
+                int64_t frac = abs_ns % unit.divisor_ns;
+                int64_t frac_scaled = frac * 1000 / unit.divisor_ns;
+                std::string frac_str = std::format("{:03d}", frac_scaled);
+
+                while (!frac_str.empty() && frac_str.back() == '0') frac_str.pop_back();
+                if (!frac_str.empty()) result += "." + frac_str;
+                result += unit.suffix;
+                break;
+            }
+        }
+
+        if (_nanoseconds < 0) result = "-" + result;
+        return result;
     }
 
     Duration operator+(const Duration& other) const {
@@ -89,6 +116,21 @@ private:
     constexpr static int64_t _ONE_S_IN_NS = 1000 * _ONE_MS_IN_NS;
     constexpr static int64_t _ONE_MIN_IN_NS = 60 * _ONE_S_IN_NS;
     constexpr static int64_t _ONE_H_IN_NS = 60 * _ONE_MIN_IN_NS;
+    
+    struct Unit {
+        int64_t threshold_ns;
+        int64_t divisor_ns;
+        const char* suffix;
+    };
+
+    constexpr static Unit _UNITS[] = {
+        { _ONE_H_IN_NS,   _ONE_H_IN_NS,   " h" },
+        { _ONE_MIN_IN_NS, _ONE_MIN_IN_NS, " min" },
+        { _ONE_S_IN_NS,   _ONE_S_IN_NS,   " s" },
+        { _ONE_MS_IN_NS,  _ONE_MS_IN_NS,  " ms" },
+        { _ONE_US_IN_NS,  _ONE_US_IN_NS,  " us" },
+        { 0,             1,               " ns" } // fallback
+    };
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Duration& d) {
