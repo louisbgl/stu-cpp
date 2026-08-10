@@ -112,6 +112,12 @@ public:
         return result;
     }
 
+    Duration operator-() const {
+        Duration result;
+        result._nanoseconds = -_nanoseconds;
+        return result;
+    }
+
 private:
     int64_t _nanoseconds = 0; // gives a max of ~292 years (negative or positive)
 
