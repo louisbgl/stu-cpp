@@ -41,12 +41,24 @@ public:
         return _nanoseconds;
     }
 
-    int64_t in_us() const {
-        return _nanoseconds / _ONE_US_IN_NS;
+    double in_us() const {
+        return static_cast<double>(_nanoseconds) / _ONE_US_IN_NS;
     }
 
-    int64_t in_ms() const {
-        return _nanoseconds / _ONE_MS_IN_NS;
+    double in_ms() const {
+        return static_cast<double>(_nanoseconds) / _ONE_MS_IN_NS;
+    }
+
+    double in_s() const {
+        return static_cast<double>(_nanoseconds) / _ONE_S_IN_NS;
+    }
+
+    double in_min() const {
+        return static_cast<double>(_nanoseconds) / _ONE_MIN_IN_NS;
+    }
+
+    double in_h() const {
+        return static_cast<double>(_nanoseconds) / _ONE_H_IN_NS;
     }
 
     std::string to_string() const {
