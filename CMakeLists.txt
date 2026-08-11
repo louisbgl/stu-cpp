@@ -14,8 +14,13 @@ else()
 endif()
 
 option(STU_BUILD_TESTS "Build tests" ON)
+option(STU_BUILD_EXAMPLES "Build examples" ON)
 
 if(STU_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
+endif()
+
+if(STU_BUILD_EXAMPLES)
+    add_subdirectory(examples)
 endif()
