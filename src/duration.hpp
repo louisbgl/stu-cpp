@@ -28,10 +28,7 @@ public:
      * @throws stu::StuException if the resulting duration would overflow or underflow. 
      */
     static Duration from_us(int64_t microseconds) {
-        if (microseconds > INT64_MAX / _ONE_US_IN_NS) throw StuException("Duration::from_us overflow: " + std::to_string(microseconds));
-        if (microseconds < INT64_MIN / _ONE_US_IN_NS) throw StuException("Duration::from_us underflow: " + std::to_string(microseconds));
-
-        return Duration::from_ns(microseconds * _ONE_US_IN_NS);
+        return from_unit_checked(microseconds, _ONE_US_IN_NS, "us");
     }
 
     /*
@@ -41,10 +38,7 @@ public:
      * @throws stu::StuException if the resulting duration would overflow or underflow. 
      */
     static Duration from_ms(int64_t milliseconds) {
-        if (milliseconds > INT64_MAX / _ONE_MS_IN_NS) throw StuException("Duration::from_ms overflow: " + std::to_string(milliseconds));
-        if (milliseconds < INT64_MIN / _ONE_MS_IN_NS) throw StuException("Duration::from_ms underflow: " + std::to_string(milliseconds));
-
-        return Duration::from_ns(milliseconds * _ONE_MS_IN_NS);
+        return from_unit_checked(milliseconds, _ONE_MS_IN_NS, "ms");
     }
 
     /*
@@ -54,10 +48,7 @@ public:
      * @throws stu::StuException if the resulting duration would overflow or underflow. 
      */
     static Duration from_s(int64_t seconds) {
-        if (seconds > INT64_MAX / _ONE_S_IN_NS) throw StuException("Duration::from_s overflow: " + std::to_string(seconds));
-        if (seconds < INT64_MIN / _ONE_S_IN_NS) throw StuException("Duration::from_s underflow: " + std::to_string(seconds));
-
-        return Duration::from_ns(seconds * _ONE_S_IN_NS);
+        return from_unit_checked(seconds, _ONE_S_IN_NS, "s");
     }
 
     /*
@@ -67,10 +58,7 @@ public:
      * @throws stu::StuException if the resulting duration would overflow or underflow. 
      */
     static Duration from_min(int64_t minutes) {
-        if (minutes > INT64_MAX / _ONE_MIN_IN_NS) throw StuException("Duration::from_min overflow: " + std::to_string(minutes));
-        if (minutes < INT64_MIN / _ONE_MIN_IN_NS) throw StuException("Duration::from_min underflow: " + std::to_string(minutes));
-
-        return Duration::from_ns(minutes * _ONE_MIN_IN_NS);
+        return from_unit_checked(minutes, _ONE_MIN_IN_NS, "min");
     }
 
     /*
@@ -80,10 +68,7 @@ public:
      * @throws stu::StuException if the resulting duration would overflow or underflow. 
      */
     static Duration from_h(int64_t hours) {
-        if (hours > INT64_MAX / _ONE_H_IN_NS) throw StuException("Duration::from_h overflow: " + std::to_string(hours));
-        if (hours < INT64_MIN / _ONE_H_IN_NS) throw StuException("Duration::from_h underflow: " + std::to_string(hours));
-
-        return Duration::from_ns(hours * _ONE_H_IN_NS);
+        return from_unit_checked(hours, _ONE_H_IN_NS, "h");
     }
 
     // Get the duration in nanoseconds
@@ -280,6 +265,12 @@ private:
         { _ONE_US_IN_NS,  _ONE_US_IN_NS,  "us" },
         { 0,             1,               "ns" } // fallback
     };
+
+    static Duration from_unit_checked(int64_t value, int64_t multiplier, const char* unit_name) {
+        if (value > INT64_MAX / multiplier) throw StuException("Duration::from_" + std::string(unit_name) + " overflow: " + std::to_string(value));
+        if (value < INT64_MIN / multiplier) throw StuException("Duration::from_" + std::string(unit_name) + " underflow: " + std::to_string(value));
+        return Duration::from_ns(value * multiplier);
+    }
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Duration& d) {
