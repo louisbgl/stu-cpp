@@ -55,15 +55,14 @@ cmake --build build --target run_duration
 
 See [`examples/duration.cpp`](examples/duration.cpp) for a walkthrough of Duration usage.
 
-## Testing
+## Building & Testing
 
-tbd
-
-**Build:**
+Requires CMake 3.15+ and a C++20 compiler.
 
 ```bash
-g++ -std=c++20 example.cpp -o example
-./example
+cmake -S . -B build
+cmake --build build
+ctest --test-dir build --output-on-failure
 ```
 
 ## API Reference
