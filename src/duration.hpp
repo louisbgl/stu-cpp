@@ -21,28 +21,68 @@ public:
         return d;
     }
 
-    // Create a Duration from a number of microseconds
+    /*
+     * @brief Create a Duration from a number of microseconds.
+     * @param microseconds The number of microseconds to create the Duration from.
+     * @return A Duration object representing the specified number of microseconds.
+     * @throws stu::StuException if the resulting duration would overflow or underflow. 
+     */
     static Duration from_us(int64_t microseconds) {
+        if (microseconds > INT64_MAX / _ONE_US_IN_NS) throw StuException("Duration::from_us overflow: " + std::to_string(microseconds));
+        if (microseconds < INT64_MIN / _ONE_US_IN_NS) throw StuException("Duration::from_us underflow: " + std::to_string(microseconds));
+
         return Duration::from_ns(microseconds * _ONE_US_IN_NS);
     }
 
-    // Create a Duration from a number of milliseconds
+    /*
+     * @brief Create a Duration from a number of milliseconds.
+     * @param milliseconds The number of milliseconds to create the Duration from.
+     * @return A Duration object representing the specified number of milliseconds.
+     * @throws stu::StuException if the resulting duration would overflow or underflow. 
+     */
     static Duration from_ms(int64_t milliseconds) {
+        if (milliseconds > INT64_MAX / _ONE_MS_IN_NS) throw StuException("Duration::from_ms overflow: " + std::to_string(milliseconds));
+        if (milliseconds < INT64_MIN / _ONE_MS_IN_NS) throw StuException("Duration::from_ms underflow: " + std::to_string(milliseconds));
+
         return Duration::from_ns(milliseconds * _ONE_MS_IN_NS);
     }
 
-    // Create a Duration from a number of seconds
+    /*
+     * @brief Create a Duration from a number of seconds.
+     * @param seconds The number of seconds to create the Duration from.
+     * @return A Duration object representing the specified number of seconds.
+     * @throws stu::StuException if the resulting duration would overflow or underflow. 
+     */
     static Duration from_s(int64_t seconds) {
+        if (seconds > INT64_MAX / _ONE_S_IN_NS) throw StuException("Duration::from_s overflow: " + std::to_string(seconds));
+        if (seconds < INT64_MIN / _ONE_S_IN_NS) throw StuException("Duration::from_s underflow: " + std::to_string(seconds));
+
         return Duration::from_ns(seconds * _ONE_S_IN_NS);
     }
 
-    // Create a Duration from a number of minutes
+    /*
+     * @brief Create a Duration from a number of minutes.
+     * @param minutes The number of minutes to create the Duration from.
+     * @return A Duration object representing the specified number of minutes.
+     * @throws stu::StuException if the resulting duration would overflow or underflow. 
+     */
     static Duration from_min(int64_t minutes) {
+        if (minutes > INT64_MAX / _ONE_MIN_IN_NS) throw StuException("Duration::from_min overflow: " + std::to_string(minutes));
+        if (minutes < INT64_MIN / _ONE_MIN_IN_NS) throw StuException("Duration::from_min underflow: " + std::to_string(minutes));
+
         return Duration::from_ns(minutes * _ONE_MIN_IN_NS);
     }
 
-    // Create a Duration from a number of hours
+    /*
+     * @brief Create a Duration from a number of hours.
+     * @param hours The number of hours to create the Duration from.
+     * @return A Duration object representing the specified number of hours.
+     * @throws stu::StuException if the resulting duration would overflow or underflow. 
+     */
     static Duration from_h(int64_t hours) {
+        if (hours > INT64_MAX / _ONE_H_IN_NS) throw StuException("Duration::from_h overflow: " + std::to_string(hours));
+        if (hours < INT64_MIN / _ONE_H_IN_NS) throw StuException("Duration::from_h underflow: " + std::to_string(hours));
+
         return Duration::from_ns(hours * _ONE_H_IN_NS);
     }
 
