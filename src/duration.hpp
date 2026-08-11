@@ -2,7 +2,10 @@
 
 #include <string>
 #include <format>
+#include <cstdint>
 #include <iostream>
+
+#include "exception.hpp"
 
 namespace stu {
 
@@ -101,27 +104,59 @@ public:
     }
 
     Duration operator+(const Duration& other) const {
-        // TODO: overflow check - large positive + large positive can overflow int64_t
+        // a + b > INT64_MAX equivalent to a > INT64_MAX - b
+        // positive case
+        if (_nanoseconds > 0 && other._nanoseconds > 0 && _nanoseconds > INT64_MAX - other._nanoseconds) {
+            throw StuException("Duration addition overflow: " + std::to_string(_nanoseconds) + " + " + std::to_string(other._nanoseconds));
+        }
+
+        // negative case
+        if (_nanoseconds < 0 && other._nanoseconds < 0 && _nanoseconds < INT64_MIN - other._nanoseconds) {
+            throw StuException("Duration addition underflow: " + std::to_string(_nanoseconds) + " + " + std::to_string(other._nanoseconds));
+        }
+
         Duration result;
         result._nanoseconds = _nanoseconds + other._nanoseconds;
         return result;
     }
 
     Duration operator-(const Duration& other) const {
-        // TODO: overflow check - large negative - large positive can overflow int64_t
+        // if a positive and b negative, a - b > INT64_MAX equivalent to a > INT64_MAX + b
+        if (_nanoseconds > 0 && other._nanoseconds < 0 && _nanoseconds > INT64_MAX + other._nanoseconds) {
+            throw StuException("Duration subtraction overflow: " + std::to_string(_nanoseconds) + " - " + std::to_string(other._nanoseconds));
+        }
+
+        // if a negative and b positive, a - b < INT64_MIN equivalent to a < INT64_MIN + b
+        if (_nanoseconds < 0 && other._nanoseconds > 0 && _nanoseconds < INT64_MIN + other._nanoseconds) {
+            throw StuException("Duration subtraction underflow: " + std::to_string(_nanoseconds) + " - " + std::to_string(other._nanoseconds));
+        }
+
         Duration result;
         result._nanoseconds = _nanoseconds - other._nanoseconds;
         return result;
     }
 
     Duration operator*(int64_t scalar) const {
-        // TODO: overflow check - large duration * large scalar can overflow int64_t
+        if (scalar == 0) return Duration::from_ns(0);
+
+        // a * b > INT64_MAX equivalent to a > INT64_MAX / b
+        if (scalar > 0 && (_nanoseconds > INT64_MAX / scalar || _nanoseconds < INT64_MIN / scalar)) {
+            throw StuException("Duration multiplication overflow: " + std::to_string(_nanoseconds) + " * " + std::to_string(scalar));
+        }
+
+        // negative scalar division flips bounds
+        if (scalar < 0 && (_nanoseconds > INT64_MIN / scalar || _nanoseconds < INT64_MAX / scalar)) {
+            throw StuException("Duration multiplication overflow: " + std::to_string(_nanoseconds) + " * " + std::to_string(scalar));
+        }
+
         Duration result;
         result._nanoseconds = _nanoseconds * scalar;
         return result;
     }
 
     Duration operator/(int64_t scalar) const {
+        if (scalar == 0) throw StuException("Duration division by zero");
+        
         Duration result;
         result._nanoseconds = _nanoseconds / scalar;
         return result;
