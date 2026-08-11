@@ -144,7 +144,7 @@ public:
             remaining -= whole * unit.divisor_ns;
         }
         
-        if (result.empty()) result = "0 ns";
+        if (result.empty()) result = "0ns";
         if (_nanoseconds < 0) result = "-" + result;
         return result;
     }
@@ -278,4 +278,4 @@ inline std::ostream& operator<<(std::ostream& os, const Duration& d) {
     return os;
 }
 
-}
+} // namespace stu
