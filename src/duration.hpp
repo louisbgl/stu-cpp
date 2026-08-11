@@ -14,36 +14,44 @@ public:
     Duration() = default;
     ~Duration() = default;
 
+    // Create a Duration from a number of nanoseconds
     static Duration from_ns(int64_t nanoseconds) {
         Duration d;
         d._nanoseconds = nanoseconds;
         return d;
     }
 
+    // Create a Duration from a number of microseconds
     static Duration from_us(int64_t microseconds) {
         return Duration::from_ns(microseconds * _ONE_US_IN_NS);
     }
 
+    // Create a Duration from a number of milliseconds
     static Duration from_ms(int64_t milliseconds) {
         return Duration::from_ns(milliseconds * _ONE_MS_IN_NS);
     }
 
+    // Create a Duration from a number of seconds
     static Duration from_s(int64_t seconds) {
         return Duration::from_ns(seconds * _ONE_S_IN_NS);
     }
 
+    // Create a Duration from a number of minutes
     static Duration from_min(int64_t minutes) {
         return Duration::from_ns(minutes * _ONE_MIN_IN_NS);
     }
 
+    // Create a Duration from a number of hours
     static Duration from_h(int64_t hours) {
         return Duration::from_ns(hours * _ONE_H_IN_NS);
     }
 
+    // Get the duration in nanoseconds
     int64_t in_ns() const {
         return _nanoseconds;
     }
 
+    // Get the duration in microseconds
     double in_us() const {
         return static_cast<double>(_nanoseconds) / _ONE_US_IN_NS;
     }
@@ -52,18 +60,26 @@ public:
         return static_cast<double>(_nanoseconds) / _ONE_MS_IN_NS;
     }
 
+    // Get the duration in seconds
     double in_s() const {
         return static_cast<double>(_nanoseconds) / _ONE_S_IN_NS;
     }
 
+    // Get the duration in minutes
     double in_min() const {
         return static_cast<double>(_nanoseconds) / _ONE_MIN_IN_NS;
     }
 
+    // Get the duration in hours
     double in_h() const {
         return static_cast<double>(_nanoseconds) / _ONE_H_IN_NS;
     }
 
+    /*
+     * @brief Convert the duration to a human-readable string representation.
+     * The string representation will use the largest appropriate time unit (h, min, s, ms, us, ns) and will include up to three decimal places for fractional values.
+     * For example: 1 hour, 30 minutes will be represented as "1.5h"
+     */
     std::string to_string() const {
         std::string result = "";
         int64_t abs_ns = _nanoseconds >= 0 ? _nanoseconds : -_nanoseconds;
@@ -87,6 +103,11 @@ public:
         return result;
     }
 
+    /*
+     * @brief Convert the duration to a human-readable string representation in exact mode.
+     * The string representation will include all time units (h, min, s, ms, us, ns) that are non-zero, separated by spaces.
+     * For example: 1 hour, 30 minutes, 15 seconds will be represented as "1h 30min 15s"
+     */
     std::string to_string_exact() const {
         std::string result = "";
         int64_t remaining = _nanoseconds >= 0 ? _nanoseconds : -_nanoseconds;
@@ -103,6 +124,7 @@ public:
         return result;
     }
 
+    // Throws stu::StuException on overlow or underflow
     Duration operator+(const Duration& other) const {
         // a + b > INT64_MAX equivalent to a > INT64_MAX - b
         // positive case
@@ -120,6 +142,7 @@ public:
         return result;
     }
 
+    // Throws stu::StuException on overlow or underflow
     Duration operator-(const Duration& other) const {
         // if a positive and b negative, a - b > INT64_MAX equivalent to a > INT64_MAX + b
         if (_nanoseconds > 0 && other._nanoseconds < 0 && _nanoseconds > INT64_MAX + other._nanoseconds) {
@@ -136,6 +159,7 @@ public:
         return result;
     }
 
+    // Throws stu::StuException on overlow or underflow
     Duration operator*(int64_t scalar) const {
         if (scalar == 0) return Duration::from_ns(0);
 
@@ -154,9 +178,10 @@ public:
         return result;
     }
 
+    // Throws stu::StuException on division by zero
     Duration operator/(int64_t scalar) const {
         if (scalar == 0) throw StuException("Duration division by zero");
-        
+
         Duration result;
         result._nanoseconds = _nanoseconds / scalar;
         return result;
