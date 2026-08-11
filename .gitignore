@@ -31,6 +31,7 @@ compile_commands.json
 testing
 test
 tests/test_*
+!tests/test_*.cpp
 stu_tests
 
 # Documentation (except specific files)
