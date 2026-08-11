@@ -45,7 +45,15 @@ target_link_libraries(your_app PRIVATE stu)
 
 ## Examples
 
-tbd
+Build and run examples with CMake from the project root:
+
+```bash
+cmake -S . -B build && cmake --build build
+
+cmake --build build --target run_duration
+```
+
+See [`examples/duration.cpp`](examples/duration.cpp) for a walkthrough of Duration usage.
 
 ## Testing
 
