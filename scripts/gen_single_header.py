@@ -9,6 +9,7 @@ def amalgamate(src_dir, output_file):
     files = [
         'exception.hpp',
         'duration.hpp',
+        'instant.hpp',
     ]
 
     output_lines = []
