@@ -23,13 +23,39 @@ public:
     }
 
     Instant operator+(const Duration& duration) const {
+        // TODO: check overflow
         auto new_time_point = _time_point + std::chrono::nanoseconds(duration.in_ns());
         return Instant(new_time_point);
     }
 
     Instant operator-(const Duration& duration) const {
+        // TODO: check overflow
         auto new_time_point = _time_point - std::chrono::nanoseconds(duration.in_ns());
         return Instant(new_time_point);
+    }
+
+    bool operator==(const Instant& other) const {
+        return _time_point == other._time_point;
+    }
+
+    bool operator!=(const Instant& other) const {
+        return _time_point != other._time_point;
+    }
+
+    bool operator<(const Instant& other) const {
+        return _time_point < other._time_point;
+    }
+
+    bool operator<=(const Instant& other) const {
+        return _time_point <= other._time_point;
+    }
+
+    bool operator>(const Instant& other) const {
+        return _time_point > other._time_point;
+    }
+    
+    bool operator>=(const Instant& other) const {
+        return _time_point >= other._time_point;
     }
 
 private:
