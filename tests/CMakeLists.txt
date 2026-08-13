@@ -7,7 +7,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Catch2)
 
-add_executable(stu_tests test_duration.cpp)
+add_executable(stu_tests test_duration.cpp test_instant.cpp)
 target_link_libraries(stu_tests PRIVATE stu Catch2::Catch2WithMain)
 
 if(STU_SINGLE_HEADER)

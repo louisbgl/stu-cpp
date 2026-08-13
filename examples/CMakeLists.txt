@@ -1,4 +1,4 @@
-set(EXAMPLES duration)
+set(EXAMPLES duration instant)
 
 foreach(EXAMPLE ${EXAMPLES})
     set(TARGET example_${EXAMPLE})
