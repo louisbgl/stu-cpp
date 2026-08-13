@@ -1,5 +1,4 @@
 #include "instant.hpp"
-#include "stu.hpp"
 
 #include <iostream>
 #include <thread>
@@ -19,8 +18,10 @@ int main() {
     stu::Instant future = now + two_seconds;
     // cant print instant yet...
 
-    stu::Instant past = future - two_seconds; // should be equal to now (almost, i suppose)
-
+    stu::Instant past = future - two_seconds; // Instant - 2s + 2s = Instant, as it should be
+    if (past == now) {
+        std::cout << "Past is equal to now." << std::endl;
+    }
 
     return 0;
 }
