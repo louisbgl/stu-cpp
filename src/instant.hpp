@@ -23,14 +23,26 @@ public:
     }
 
     Instant operator+(const Duration& duration) const {
-        // TODO: check overflow
-        auto new_time_point = _time_point + std::chrono::nanoseconds(duration.in_ns());
+        int64_t tp_ns = _time_point.time_since_epoch().count();
+        int64_t dur_ns = duration.in_ns();
+        if ((dur_ns > 0 && tp_ns > INT64_MAX - dur_ns))
+            throw StuException("Instant addition overflow: " + std::to_string(tp_ns) + " + " + std::to_string(dur_ns));
+        if ((dur_ns < 0 && tp_ns < INT64_MIN - dur_ns))
+            throw StuException("Instant addition underflow: " + std::to_string(tp_ns) + " + " + std::to_string(dur_ns));
+        
+        auto new_time_point = _time_point + std::chrono::nanoseconds(dur_ns);
         return Instant(new_time_point);
     }
 
     Instant operator-(const Duration& duration) const {
-        // TODO: check overflow
-        auto new_time_point = _time_point - std::chrono::nanoseconds(duration.in_ns());
+        int64_t tp_ns = _time_point.time_since_epoch().count();
+        int64_t dur_ns = duration.in_ns();
+        if ((dur_ns > 0 && tp_ns < INT64_MIN + dur_ns))
+            throw StuException("Instant subtraction underflow: " + std::to_string(tp_ns) + " - " + std::to_string(dur_ns));
+        if ((dur_ns < 0 && tp_ns > INT64_MAX + dur_ns))
+            throw StuException("Instant subtraction overflow: " + std::to_string(tp_ns) + " - " + std::to_string(dur_ns));
+        
+        auto new_time_point = _time_point - std::chrono::nanoseconds(dur_ns);
         return Instant(new_time_point);
     }
 
@@ -53,7 +65,7 @@ public:
     bool operator>(const Instant& other) const {
         return _time_point > other._time_point;
     }
-    
+
     bool operator>=(const Instant& other) const {
         return _time_point >= other._time_point;
     }
