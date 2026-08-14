@@ -274,11 +274,24 @@ TEST_CASE("Duration threshold boundary exact promotion", "[duration][string]") {
 }
 
 TEST_CASE("Duration precision in to_string", "[duration][string]") {
-    // Max 3 decimal digits
+    // Max 3 decimal digits with rounding
     auto d = Duration::from_ns(1234567);  // 1.234567 ms
-    REQUIRE(d.to_string() == "1.234ms");  // truncated to 3 digits
+    REQUIRE(d.to_string() == "1.235ms");  // rounded to 3 digits (0.567 rounds up)
 
     // Trailing zeros trimmed
     auto d2 = Duration::from_ns(1000000);  // exactly 1 ms
     REQUIRE(d2.to_string() == "1ms");  // no ".000"
+}
+
+TEST_CASE("Duration to_string rounding overflow to whole part", "[duration][string]") {
+    // When fractional part rounds to 1.000, should roll over to whole part
+    auto d = Duration::from_ns(4999999004);  // 4.999999004s
+    REQUIRE(d.to_string() == "5s");  // rounds to 5s, not "4.1s"
+
+    auto d2 = Duration::from_ns(-4999999004);  // negative case
+    REQUIRE(d2.to_string() == "-5s");
+
+    // Cross-unit promotion: 1.9996ms rounds to 2ms
+    auto d3 = Duration::from_ns(1999600);  // 1.9996ms
+    REQUIRE(d3.to_string() == "2ms");
 }
