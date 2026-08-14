@@ -1,3 +1,4 @@
+#include "instant.hpp"
 #include "stu.hpp"
 
 #include <iostream>
@@ -18,10 +19,20 @@ int main() {
     stu::Instant future = now + two_seconds;
     // cant print instant yet...
 
-    stu::Instant past = future - two_seconds; // Instant - 2s + 2s = Instant, as it should be
-    if (past == now) {
-        std::cout << "Past is equal to now." << std::endl;
+    stu::Instant computed_now = future - two_seconds; // Instant - 2s + 2s = Instant, as it should be
+    if (computed_now == now) {
+        std::cout << "Computed now is equal to now." << std::endl;
     }
+
+    auto i1 = stu::Instant::now();
+    auto i2 = i1 + stu::Duration::from_s(5);
+    auto i3 = i1 - stu::Duration::from_s(5);
+    std::cout << "Now: " << i1 << std::endl;
+    std::cout << "Now exact: " << i1.to_string_exact() << std::endl;
+    std::cout << "In 5s: " << i2 << std::endl;
+    std::cout << "In 5s exact: " << i2.to_string_exact() << std::endl;
+    std::cout << "5s ago: " << i3 << std::endl;
+    std::cout << "5s ago exact: " << i3.to_string_exact() << std::endl;
 
     return 0;
 }
