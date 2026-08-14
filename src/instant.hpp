@@ -32,12 +32,15 @@ public:
         Duration elapsed = Instant::now() - *this;
 
         if (elapsed.in_ns() < 0) return "in " + (-elapsed).to_string();
+        else if (elapsed.in_ns() == 0) return "now";
         else return elapsed.to_string() + " ago";
     }
 
     std::string to_string_exact() const {
         Duration elapsed = Instant::now() - *this;
+
         if (elapsed.in_ns() < 0) return "in " + (-elapsed).to_string_exact();
+        else if (elapsed.in_ns() == 0) return "now";
         else return elapsed.to_string_exact() + " ago";
     }
 
