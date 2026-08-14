@@ -145,6 +145,7 @@ public:
         }
         
         if (result.empty()) result = "0ns";
+        if (!result.empty() && result.back() == ' ') result.pop_back();
         if (_nanoseconds < 0) result = "-" + result;
         return result;
     }

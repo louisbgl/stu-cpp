@@ -93,10 +93,10 @@ TEST_CASE("Duration to_string auto-scaling", "[duration][string]") {
 
 TEST_CASE("Duration to_string_exact breakdown", "[duration][string]") {
     auto d = Duration::from_h(1) + Duration::from_min(23) + Duration::from_s(4) + Duration::from_ms(567);
-    REQUIRE(d.to_string_exact() == "1h 23min 4s 567ms ");
+    REQUIRE(d.to_string_exact() == "1h 23min 4s 567ms");
 
     auto d2 = Duration::from_ns(1234);
-    REQUIRE(d2.to_string_exact() == "1us 234ns ");
+    REQUIRE(d2.to_string_exact() == "1us 234ns");
 }
 
 TEST_CASE("Duration addition", "[duration][arithmetic]") {
