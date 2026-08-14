@@ -29,16 +29,16 @@ public:
     }
 
     std::string to_string() const {
-        Instant now = Instant::now();
-        Duration elapsed = now - *this;
+        Duration elapsed = Instant::now() - *this;
 
         if (elapsed.in_ns() < 0) return "in " + (-elapsed).to_string();
         else return elapsed.to_string() + " ago";
     }
 
     std::string to_string_exact() const {
-        // TODO
-        return "TODO: Instant::to_string_exact()";
+        Duration elapsed = Instant::now() - *this;
+        if (elapsed.in_ns() < 0) return "in " + (-elapsed).to_string_exact();
+        else return elapsed.to_string_exact() + " ago";
     }
 
     Duration operator-(const Instant& other) const {
