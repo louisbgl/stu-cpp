@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <ostream>
 
 #include "exception.hpp"
 #include "duration.hpp"
@@ -25,6 +26,19 @@ public:
     // Gets the current time as an Instant
     static Instant now() {
         return Instant(std::chrono::steady_clock::now());
+    }
+
+    std::string to_string() const {
+        Instant now = Instant::now();
+        Duration elapsed = now - *this;
+
+        if (elapsed.in_ns() < 0) return "in " + (-elapsed).to_string();
+        else return elapsed.to_string() + " ago";
+    }
+
+    std::string to_string_exact() const {
+        // TODO
+        return "TODO: Instant::to_string_exact()";
     }
 
     Duration operator-(const Instant& other) const {
@@ -86,5 +100,10 @@ private:
 
     std::chrono::steady_clock::time_point _time_point;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Instant& instant) {
+    os << instant.to_string();
+    return os;
+}
 
 } // namespace stu
