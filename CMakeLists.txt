@@ -21,8 +21,16 @@ else()
     target_include_directories(stu INTERFACE ${CMAKE_SOURCE_DIR}/src)
 endif()
 
-option(STU_BUILD_TESTS "Build tests" ON)
-option(STU_BUILD_EXAMPLES "Build examples" ON)
+if(PROJECT_IS_TOP_LEVEL)
+    set(STU_DEFAULT_BUILD_TESTS ON)
+    set(STU_DEFAULT_BUILD_EXAMPLES ON)
+else()
+    set(STU_DEFAULT_BUILD_TESTS OFF)
+    set(STU_DEFAULT_BUILD_EXAMPLES OFF)
+endif()
+
+option(STU_BUILD_TESTS "Build tests" ${STU_DEFAULT_BUILD_TESTS})
+option(STU_BUILD_EXAMPLES "Build examples" ${STU_DEFAULT_BUILD_EXAMPLES})
 
 if(STU_BUILD_TESTS)
     enable_testing()
