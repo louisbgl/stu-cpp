@@ -16,9 +16,9 @@ add_library(stu INTERFACE)
 
 option(STU_SINGLE_HEADER "Test against generated root stu.hpp instead of src/" OFF)
 if(STU_SINGLE_HEADER)
-    target_include_directories(stu INTERFACE ${CMAKE_SOURCE_DIR})
+    target_include_directories(stu INTERFACE ${PROJECT_SOURCE_DIR})
 else()
-    target_include_directories(stu INTERFACE ${CMAKE_SOURCE_DIR}/src)
+    target_include_directories(stu INTERFACE ${PROJECT_SOURCE_DIR}/src)
 endif()
 
 if(PROJECT_IS_TOP_LEVEL)
