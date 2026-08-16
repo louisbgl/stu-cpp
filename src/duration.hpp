@@ -102,19 +102,22 @@ public:
 
     /*
      * @brief Convert the duration to a human-readable string representation.
-     * The string representation will use the largest appropriate time unit (h, min, s, ms, us, ns) and will include up to three decimal places for fractional values.
-     * For example: 1 hour, 30 minutes will be represented as "1.5h"
+     * The string representation will use the largest appropriate time unit (h, min, s, ms, us, ns)
+     * and will include up to three decimal places for fractional values, rounded to nearest.
+     * For example: 1 hour, 30 minutes will be represented as "1.5h", 1.9996 seconds as "2s"
      */
     std::string to_string() const {
-        std::string result = "";
         int64_t abs_ns = _nanoseconds >= 0 ? _nanoseconds : -_nanoseconds;
-        for (const auto& unit : _UNITS) {
-            if (abs_ns >= unit.threshold_ns) {
-                int64_t whole = abs_ns / unit.divisor_ns;
-                result = std::to_string(whole);
+        int64_t display_ns = _round_to_display_precision(abs_ns);
 
-                int64_t frac = abs_ns % unit.divisor_ns;
+        std::string result = "";
+        for (const auto& unit : _UNITS) {
+            if (display_ns >= unit.threshold_ns) {
+                int64_t whole = display_ns / unit.divisor_ns;
+                int64_t frac = display_ns % unit.divisor_ns;
                 int64_t frac_scaled = frac * 1000 / unit.divisor_ns;
+
+                result = std::to_string(whole);
                 std::string frac_str = std::format("{:03d}", frac_scaled);
 
                 while (!frac_str.empty() && frac_str.back() == '0') frac_str.pop_back();
@@ -145,6 +148,7 @@ public:
         }
         
         if (result.empty()) result = "0ns";
+        if (!result.empty() && result.back() == ' ') result.pop_back();
         if (_nanoseconds < 0) result = "-" + result;
         return result;
     }
@@ -270,6 +274,25 @@ private:
         if (value > INT64_MAX / multiplier) throw StuException("Duration::from_" + std::string(unit_name) + " overflow: " + std::to_string(value));
         if (value < INT64_MIN / multiplier) throw StuException("Duration::from_" + std::string(unit_name) + " underflow: " + std::to_string(value));
         return Duration::from_ns(value * multiplier);
+    }
+
+    static int64_t _round_to_display_precision(int64_t abs_ns) {
+        for (const auto& unit : _UNITS) {
+            if (abs_ns >= unit.threshold_ns) {
+                int64_t whole = abs_ns / unit.divisor_ns;
+                int64_t frac = abs_ns % unit.divisor_ns;
+                int64_t frac_scaled = (frac * 1000 + unit.divisor_ns / 2) / unit.divisor_ns;
+
+                if (frac_scaled >= 1000) {
+                    whole++;
+                    frac_scaled = 0;
+                }
+
+                int64_t frac_ns = (frac_scaled * unit.divisor_ns) / 1000;
+                return whole * unit.divisor_ns + frac_ns;
+            }
+        }
+        return abs_ns;
     }
 };
 

@@ -12,10 +12,13 @@ A modern C++20 header-only library for time handling with clear semantics and ty
 - **Duration**: represents a timespan, with nanosecond precision
 - **Duration arithmetic**: add, subtract, multiply by scalars, compare Durations
 - **Duration pretty-printing**: Auto-scaling (`"1.234 ms"`) or exact breakdown (`"1h 23min 4s"`)
+- **Instant**: monotonic time points for measuring elapsed time
+- **Instant arithmetic**: add/subtract Durations, compute differences between Instants
+- **Instant pretty-printing**: Relative time formatting (`"5s ago"`, `"in 2.5h"`)
 
 ## Status
 
-**Early development**: `Duration` mostly complete, `Instant` and `Timestamp` not yet implemented.
+**Early development**: `Duration` and `Instant` complete. `Timestamp` not yet implemented.
 
 ## Installation
 
@@ -50,10 +53,11 @@ Build and run examples with CMake from the project root:
 ```bash
 cmake -S . -B build && cmake --build build
 
-cmake --build build --target run_duration
+cmake --build build --target example_duration
+cmake --build build --target example_instant
 ```
 
-See [`examples/duration.cpp`](examples/duration.cpp) for a walkthrough of Duration usage.
+See [`examples/duration.cpp`](examples/duration.cpp) and [`examples/instant.cpp`](examples/instant.cpp) for usage walkthroughs.
 
 ## Building & Testing
 
@@ -109,6 +113,43 @@ Duration neg = -d;          // unary negation
 ```cpp
 // ==, !=, <, <=, >, >= all supported (nanosecond-exact)
 if (d1 < d2) { ... }
+```
+
+### Instant
+
+**Construction:**
+```cpp
+auto now = stu::Instant::now();  // current time (monotonic clock)
+// No default constructor - prevents uninitialized state
+```
+
+**Arithmetic:**
+```cpp
+Instant future = now + Duration::from_s(5);     // add duration
+Instant past = now - Duration::from_s(10);      // subtract duration
+Duration elapsed = later - earlier;              // difference between instants
+// All throw stu::StuException on overflow/underflow
+```
+
+**String representation:**
+```cpp
+std::string relative = instant.to_string();        // "5s ago" or "in 2.5h"
+std::string exact = instant.to_string_exact();     // "5s 123ms 456us ago"
+std::cout << instant << "\n";                      // uses to_string()
+```
+
+**Comparison:**
+```cpp
+// ==, !=, <, <=, >, >= all supported (nanosecond-exact)
+if (instant1 < instant2) { ... }
+```
+
+**Monotonic guarantees:**
+```cpp
+// Successive calls to now() never go backwards
+auto i1 = Instant::now();
+auto i2 = Instant::now();
+assert(i2 >= i1);  // always true
 ```
 
 ## License

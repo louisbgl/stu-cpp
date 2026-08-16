@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <sstream>
 #include <thread>
 
 #ifdef STU_SINGLE_HEADER_TEST
@@ -218,4 +219,101 @@ TEST_CASE("Instant ordering transitivity", "[instant][comparison]") {
     if (i1 < i2 && i2 < i3) {
         REQUIRE(i1 < i3);
     }
+}
+
+TEST_CASE("Instant to_string() for past instant", "[instant][formatting]") {
+    auto past = Instant::now() - Duration::from_s(5);
+    auto str = past.to_string();
+
+    // Should end with " ago" and contain time unit
+    REQUIRE(str.find(" ago") != std::string::npos);
+    REQUIRE(str.find("s") != std::string::npos);
+}
+
+TEST_CASE("Instant to_string() for future instant", "[instant][formatting]") {
+    auto future = Instant::now() + Duration::from_s(10);
+    auto str = future.to_string();
+
+    // Should start with "in " and contain time unit
+    REQUIRE(str.find("in ") == 0);
+    REQUIRE(str.find("s") != std::string::npos);
+}
+
+TEST_CASE("Instant to_string() for exactly now", "[instant][formatting]") {
+    auto instant = Instant::now();
+    auto str = instant.to_string();
+
+    // Should be "now" (or close to it due to timing)
+    // Accept both "now" and very small elapsed times (< 1ms)
+    bool is_now_or_close = (str == "now") ||
+                           (str.find("ns ago") != std::string::npos) ||
+                           (str.find("us ago") != std::string::npos);
+    REQUIRE(is_now_or_close);
+}
+
+TEST_CASE("Instant to_string_exact() for past instant", "[instant][formatting]") {
+    auto past = Instant::now() - Duration::from_s(90);  // 1min 30s
+    auto str = past.to_string_exact();
+
+    // Should end with " ago" and contain multiple time units
+    REQUIRE(str.find(" ago") != std::string::npos);
+    REQUIRE(str.find("min") != std::string::npos);
+}
+
+TEST_CASE("Instant to_string_exact() for future instant", "[instant][formatting]") {
+    auto future = Instant::now() + Duration::from_h(2) + Duration::from_min(30);
+    auto str = future.to_string_exact();
+
+    // Should start with "in " and contain multiple time units
+    REQUIRE(str.find("in ") == 0);
+    REQUIRE(str.find("h") != std::string::npos);
+}
+
+TEST_CASE("Instant to_string_exact() for exactly now", "[instant][formatting]") {
+    auto instant = Instant::now();
+    auto str = instant.to_string_exact();
+
+    // Should be "now" (or close to it due to timing)
+    bool is_now_or_close = (str == "now") ||
+                           (str.find("ns ago") != std::string::npos) ||
+                           (str.find("us ago") != std::string::npos);
+    REQUIRE(is_now_or_close);
+}
+
+TEST_CASE("Instant operator<< uses to_string()", "[instant][formatting]") {
+    auto past = Instant::now() - Duration::from_ms(500);
+
+    std::ostringstream oss;
+    oss << past;
+
+    auto str = oss.str();
+    REQUIRE(str.find(" ago") != std::string::npos);
+}
+
+TEST_CASE("Instant to_string() accuracy check", "[instant][formatting]") {
+    // Create instant exactly 5 seconds in the past
+    auto past = Instant::now() - Duration::from_s(5);
+
+    // to_string() should show ~5s (allowing for execution time)
+    auto str = past.to_string();
+
+    // Should contain "5" and "s" and " ago"
+    REQUIRE(str.find("5") != std::string::npos);
+    REQUIRE(str.find("s") != std::string::npos);
+    REQUIRE(str.find(" ago") != std::string::npos);
+}
+
+TEST_CASE("Instant to_string_exact() accuracy check", "[instant][formatting]") {
+    // Create instant exactly 1h 23min 45s in the future
+    auto future = Instant::now() + Duration::from_h(1) + Duration::from_min(23) + Duration::from_s(45);
+
+    auto str = future.to_string_exact();
+
+    // Should contain hour and minute components (seconds might drift due to execution time)
+    REQUIRE(str.find("in ") == 0);
+    REQUIRE(str.find("1h") != std::string::npos);
+    REQUIRE(str.find("23min") != std::string::npos);
+    // Accept either 45s or 44s due to execution time drift
+    bool has_seconds = (str.find("45s") != std::string::npos) || (str.find("44s") != std::string::npos);
+    REQUIRE(has_seconds);
 }
