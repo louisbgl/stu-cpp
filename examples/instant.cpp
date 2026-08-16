@@ -4,6 +4,7 @@
 #include <thread>
 
 int main() {
+    // TEMPORARY EXAMPLE
     stu::Instant now = stu::Instant::now();
 
     // simulate some work
